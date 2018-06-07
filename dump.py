@@ -2,10 +2,12 @@ import inspect
 from sys import stdout
 
 def _should_dump_repr(obj):
-	return inspect.ismethod(obj) or inspect.isfunction(obj) or inspect.isgenerator(obj)
+	return inspect.ismethod(obj) or inspect.isfunction(obj) or inspect.isgenerator(obj) or inspect.istraceback(obj)
 
-def dump(obj, indent=0):
-	if isinstance(obj, str):
+def dump(obj, indent=0, visited=set()):
+	if id(obj) in visited:
+		stdout.write('\x1b[31mRecursion on %s with id=%i\x1b[0m' % (type(obj).__name__, id(obj)))
+	elif isinstance(obj, str):
 		stdout.write('\x1b[32m%s\x1b[0m' % repr(obj))
 	elif isinstance(obj, bytes):
 		stdout.write('b\x1b[32m%s\x1b[0m' % repr(obj)[1:])
@@ -22,9 +24,9 @@ def dump(obj, indent=0):
 			stdout.write('{\n')
 			for key, value in obj.items():
 				stdout.write(' ' * 2 * (indent + 1))
-				dump(key, indent + 1)
+				dump(key, indent + 1, visited | {id(obj)})
 				stdout.write(': ')
-				dump(value, indent + 1)
+				dump(value, indent + 1, visited | {id(obj)})
 				stdout.write(',\n')
 
 			stdout.write('%s}' % (' ' * 2 * indent))
@@ -36,7 +38,7 @@ def dump(obj, indent=0):
 			stdout.write('{\n')
 			for value in obj:
 				stdout.write(' ' * 2 * (indent + 1))
-				dump(value, indent + 1)
+				dump(value, indent + 1, visited | {id(obj)})
 				stdout.write(',\n')
 
 			stdout.write('%s}' % (' ' * 2 * indent))
@@ -48,7 +50,7 @@ def dump(obj, indent=0):
 			stdout.write('[\n')
 			for value in obj:
 				stdout.write(' ' * 2 * (indent + 1))
-				dump(value, indent + 1)
+				dump(value, indent + 1, visited | {id(obj)})
 				stdout.write(',\n')
 
 			stdout.write('%s]' % (' ' * 2 * indent))
@@ -59,7 +61,7 @@ def dump(obj, indent=0):
 			stdout.write('(\n')
 			for value in obj:
 				stdout.write(' ' * 2 * (indent + 1))
-				dump(value, indent + 1)
+				dump(value, indent + 1, visited | {id(obj)})
 				stdout.write(',\n')
 
 			stdout.write('%s)' % (' ' * 2 * indent))
@@ -81,7 +83,7 @@ def dump(obj, indent=0):
 			stdout.write(' {\n')
 			for key, value in attrs.items():
 				stdout.write('%s\x1b[4m%s\x1b[0m: ' % (' ' * 2 * (indent + 1), key))
-				dump(value, indent + 1)
+				dump(value, indent + 1, visited | {id(obj)})
 				stdout.write(',\n')
 
 			stdout.write('%s}' % (' ' * 2 * indent))
