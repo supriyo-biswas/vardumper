@@ -7,6 +7,8 @@ def _should_dump_repr(obj):
 def dump(obj, indent=0, visited=set()):
 	if id(obj) in visited:
 		stdout.write('\x1b[31mRecursion on %s with id=%i\x1b[0m' % (type(obj).__name__, id(obj)))
+	elif obj is None:
+		stdout.write('\x1b[3mNone\x1b[0m')
 	elif isinstance(obj, str):
 		stdout.write('\x1b[32m%s\x1b[0m' % repr(obj))
 	elif isinstance(obj, bytes):
