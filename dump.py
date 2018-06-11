@@ -2,11 +2,11 @@ import inspect
 from sys import stdout
 
 def _should_dump_repr(obj):
-    return inspect.ismethod(obj) or
-           inspect.isfunction(obj) or
-           inspect.isgenerator(obj) or
-           inspect.istraceback(obj) or
-           inspect.isbuiltin(obj)
+    return inspect.ismethod(obj)       \
+           or inspect.isfunction(obj)  \
+           or inspect.isgenerator(obj) \
+           or inspect.istraceback(obj) \
+           or inspect.isbuiltin(obj)
 
 def dump(obj, indent=0, visited=set()):
     if id(obj) in visited:
