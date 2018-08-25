@@ -79,11 +79,12 @@ def dump(obj, indent=0, visited=set()):
             if name[:2] == name[-2:] == '__' and len(name) > 4:
                 continue
 
-            value = getattr(obj, name)
-            if inspect.ismethod(value) or inspect.isbuiltin(value):
-                continue
-
-            attrs[name] = value
+            try:
+                value = getattr(obj, name)
+                if inspect.ismethod(value) or inspect.isbuiltin(value):
+                    continue
+            except AttributeError:
+                pass
 
         if attrs:
             stdout.write(' {\n')
