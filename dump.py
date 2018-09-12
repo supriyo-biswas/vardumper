@@ -83,6 +83,8 @@ def dump(obj, indent=0, visited=set()):
                 value = getattr(obj, name)
                 if inspect.ismethod(value) or inspect.isbuiltin(value):
                     continue
+
+                attrs[name] = value
             except AttributeError:
                 pass
 
